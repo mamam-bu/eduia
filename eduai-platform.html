@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduAI — Plateforme d'apprentissage</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  /* ===== RESET & BASE ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f7f7f5;
+    --bg-tertiary: #f0efe9;
+    --text-primary: #1a1a18;
+    --text-secondary: #6b6b67;
+    --text-tertiary: #ababA5;
+    --border: rgba(0,0,0,0.1);
+    --border-md: rgba(0,0,0,0.2);
+    --purple: #7F77DD;
+    --purple-light: #EEEDFE;
+    --purple-dark: #3C3489;
+    --green: #1D9E75;
+    --green-light: #E1F5EE;
+    --coral: #D85A30;
+    --coral-light: #FAECE7;
+    --blue: #378ADD;
+    --blue-light: #E6F1FB;
+    --amber: #EF9F27;
+    --pink: #D4537E;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1c1c1a;
+      --bg-secondary: #252523;
+      --bg-tertiary: #2e2e2b;
+      --text-primary: #f0efe9;
+      --text-secondary: #9a9a94;
+      --text-tertiary: #5a5a56;
+      --border: rgba(255,255,255,0.08);
+      --border-md: rgba(255,255,255,0.15);
+      --purple-light: #2a2850;
+      --purple-dark: #b0abee;
+      --green-light: #0e2e22;
+      --coral-light: #2e1a10;
+      --blue-light: #0e2038;
+    }
+  }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  /* ===== APP SHELL ===== */
+  .app {
+    display: flex;
+    width: 100%;
+    max-width: 1100px;
+    height: 680px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--bg-primary);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width: 220px;
+    min-width: 220px;
+    border-right: 0.5px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-secondary);
+  }
+
+  .logo {
+    padding: 16px;
+    border-bottom: 0.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-icon {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    background: var(--purple);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 17px;
+    flex-shrink: 0;
+  }
+  .logo-text { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+  .logo-sub { font-size: 11px; color: var(--text-tertiary); }
+
+  .nav { padding: 12px 8px; flex: 1; overflow-y: auto; }
+  .nav-label {
+    font-size: 10px; color: var(--text-tertiary);
+    padding: 10px 10px 4px;
+    text-transform: uppercase; letter-spacing: .06em; font-weight: 600;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: var(--radius-sm);
+    cursor: pointer; font-size: 13px;
+    color: var(--text-secondary); margin-bottom: 2px;
+    transition: background .15s, color .15s;
+    user-select: none;
+  }
+  .nav-item:hover { background: var(--bg-primary); color: var(--text-primary); }
+  .nav-item.active {
+    background: var(--bg-primary);
+    color: var(--text-primary); font-weight: 500;
+  }
+  .nav-item.active i { color: var(--purple); }
+  .nav-item i { font-size: 17px; width: 20px; text-align: center; flex-shrink: 0; }
+  .nav-badge {
+    margin-left: auto;
+    background: var(--purple); color: #fff;
+    font-size: 10px; padding: 2px 7px; border-radius: 12px; font-weight: 600;
+  }
+
+  .sidebar-bottom {
+    margin: 10px 8px 12px;
+    padding: 12px 14px;
+    background: var(--bg-primary);
+    border-radius: var(--radius-md);
+    border: 0.5px solid var(--border);
+  }
+  .progress-title { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .progress-title span { font-weight: 500; color: var(--purple); }
+  .progress-track { background: var(--bg-tertiary); border-radius: 4px; height: 6px; margin-bottom: 6px; }
+  .progress-fill { height: 6px; border-radius: 4px; background: var(--purple); transition: width .4s ease; }
+  .progress-stats { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-tertiary); }
+
+  /* ===== MAIN ===== */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+  .topbar {
+    padding: 12px 20px;
+    border-bottom: 0.5px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+    background: var(--bg-primary);
+  }
+  .topbar-title { font-size: 16px; font-weight: 500; color: var(--text-primary); flex: 1; }
+  .search-box {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg-secondary);
+    border: 0.5px solid var(--border);
+    border-radius: 8px; padding: 6px 12px;
+    font-size: 13px; color: var(--text-tertiary); cursor: pointer;
+    transition: border-color .15s;
+  }
+  .search-box:hover { border-color: var(--border-md); }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--green); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; flex-shrink: 0;
+  }
+
+  .content { flex: 1; overflow-y: auto; padding: 20px; }
+
+  /* ===== PANELS ===== */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ===== STAT CARDS ===== */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px; margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 14px 12px; text-align: center;
+    border: 0.5px solid var(--border);
+  }
+  .stat-num { font-size: 24px; font-weight: 600; }
+  .stat-lbl { font-size: 11px; color: var(--text-secondary); margin-top: 3px; }
+
+  /* ===== COURSE CARDS ===== */
+  .section-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; }
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px; margin-bottom: 20px;
+  }
+  .course-card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden; cursor: pointer;
+    transition: border-color .15s, transform .15s, box-shadow .15s;
+  }
+  .course-card:hover {
+    border-color: var(--border-md);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+  .course-thumb {
+    height: 72px; display: flex;
+    align-items: center; justify-content: center; font-size: 30px;
+  }
+  .course-body { padding: 10px 12px 12px; }
+  .course-tag {
+    font-size: 10px; padding: 2px 8px;
+    border-radius: 6px; margin-bottom: 6px;
+    display: inline-block; font-weight: 600;
+  }
+  .tag-math { background: var(--purple-light); color: var(--purple-dark); }
+  .tag-sci  { background: var(--green-light);  color: var(--green); }
+  .tag-lang { background: var(--coral-light);  color: var(--coral); }
+  .tag-hist { background: var(--blue-light);   color: var(--blue); }
+  .course-name { font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 4px; }
+  .course-meta { font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
+  .mini-bar { height: 3px; background: var(--bg-tertiary); border-radius: 2px; margin-top: 8px; }
+  .mini-fill { height: 3px; border-radius: 2px; }
+
+  /* ===== EVENT LIST ===== */
+  .event-list { display: flex; flex-direction: column; gap: 8px; }
+  .event-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border-left: 3px solid var(--purple);
+  }
+  .event-time { font-size: 11px; color: var(--text-secondary); min-width: 52px; }
+  .event-name { font-size: 13px; color: var(--text-primary); font-weight: 500; }
+  .event-sub  { font-size: 11px; color: var(--text-secondary); }
+
+  /* ===== AI TUTOR ===== */
+  .ai-panel { display: flex; flex-direction: column; height: 560px; }
+  .quick-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .quick-btn {
+    padding: 5px 13px;
+    border: 0.5px solid var(--border-md);
+    border-radius: 20px; font-size: 12px; cursor: pointer;
+    color: var(--text-secondary); background: var(--bg-primary);
+    transition: background .15s, color .15s; font-family: inherit;
+  }
+  .quick-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+  .ai-msgs { flex: 1; overflow-y: auto; padding: 0 0 12px; display: flex; flex-direction: column; gap: 16px; }
+  .ai-msg { display: flex; gap: 10px; align-items: flex-start; }
+  .ai-msg.user { flex-direction: row-reverse; }
+  .ai-bubble {
+    max-width: 80%; padding: 10px 14px;
+    font-size: 13px; line-height: 1.65;
+    white-space: pre-wrap;
+  }
+  .ai-msg.bot .ai-bubble {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 0.5px solid var(--border);
+    border-radius: 4px 12px 12px 12px;
+  }
+  .ai-msg.user .ai-bubble {
+    background: var(--purple); color: #fff;
+    border-radius: 12px 4px 12px 12px;
+  }
+  .ai-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0;
+  }
+  .ai-avatar.bot  { background: var(--purple-light); color: var(--purple-dark); }
+  .ai-avatar.user { background: var(--green); color: #fff; font-size: 11px; font-weight: 600; }
+  .ai-input-row {
+    display: flex; gap: 8px;
+    padding-top: 12px; border-top: 0.5px solid var(--border);
+  }
+  .ai-input {
+    flex: 1; padding: 9px 14px;
+    border: 0.5px solid var(--border);
+    border-radius: 8px; font-size: 13px;
+    background: var(--bg-primary); color: var(--text-primary);
+    outline: none; font-family: inherit;
+    transition: border-color .15s;
+  }
+  .ai-input:focus { border-color: var(--purple); }
+  .ai-send {
+    padding: 9px 16px;
+    background: var(--purple); color: #fff;
+    border: none; border-radius: 8px; cursor: pointer;
+    font-size: 13px; display: flex; align-items: center; gap: 5px;
+    transition: opacity .15s;
+  }
+  .ai-send:hover { opacity: .9; }
+  .typing {
+    display: none; align-items: center; gap: 6px;
+    padding: 10px 14px;
+    background: var(--bg-secondary);
+    border: 0.5px solid var(--border);
+    border-radius: 4px 12px 12px 12px;
+    font-size: 12px; color: var(--text-secondary);
+    width: fit-content; margin-bottom: 4px;
+  }
+  .typing.show { display: flex; }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--text-tertiary);
+    animation: blink 1.2s infinite;
+  }
+  .dot:nth-child(2) { animation-delay: .2s; }
+  .dot:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%,80%,100%{opacity:.3} 40%{opacity:1} }
+
+  /* ===== QUIZ ===== */
+  .score-bar {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 18px; padding: 14px 16px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    border: 0.5px solid var(--border);
+  }
+  .score-num { font-size: 26px; font-weight: 600; color: var(--purple); min-width: 50px; }
+  .score-info { flex: 1; }
+  .score-info-title { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+  .score-info-sub   { font-size: 12px; color: var(--text-secondary); }
+  .reset-btn {
+    padding: 7px 16px;
+    background: transparent; border: 0.5px solid var(--border-md);
+    border-radius: 8px; cursor: pointer;
+    font-size: 13px; color: var(--text-secondary);
+    display: flex; align-items: center; gap: 6px;
+    transition: background .15s; font-family: inherit;
+  }
+  .reset-btn:hover { background: var(--bg-primary); }
+  .quiz-q {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 16px; margin-bottom: 14px;
+    border: 0.5px solid var(--border);
+  }
+  .quiz-q p { font-size: 14px; font-weight: 500; color: var(--text-primary); margin-bottom: 12px; }
+  .quiz-opt {
+    display: block; padding: 9px 13px;
+    border: 0.5px solid var(--border);
+    border-radius: 8px; margin-bottom: 7px; cursor: pointer;
+    font-size: 13px; color: var(--text-secondary);
+    background: var(--bg-primary); text-align: left; width: 100%;
+    transition: background .12s, border-color .12s; font-family: inherit;
+  }
+  .quiz-opt:hover:not(:disabled) { background: var(--bg-secondary); border-color: var(--border-md); }
+  .quiz-opt:disabled { cursor: default; }
+  .quiz-opt.correct { background: #EAF3DE; border-color: #639922; color: #3B6D11; }
+  .quiz-opt.wrong   { background: #FCEBEB; border-color: #A32D2D; color: #791F1F; }
+  .quiz-result {
+    display: none; padding: 10px 14px;
+    border-radius: 8px; font-size: 13px; margin-top: 8px; line-height: 1.5;
+  }
+  .quiz-result.show { display: block; }
+  .quiz-result.ok  { background: #EAF3DE; color: #3B6D11; border: 0.5px solid #97C459; }
+  .quiz-result.bad { background: #FCEBEB; color: #791F1F; border: 0.5px solid #F09595; }
+
+  /* ===== AGENDA / CALENDAR ===== */
+  .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 18px; }
+  .cal-head { text-align: center; font-size: 11px; color: var(--text-tertiary); padding: 5px 0; font-weight: 500; }
+  .cal-day {
+    text-align: center; padding: 7px 2px;
+    border-radius: 7px; font-size: 12px; cursor: pointer;
+    color: var(--text-secondary); position: relative;
+    transition: background .12s;
+  }
+  .cal-day:hover { background: var(--bg-secondary); }
+  .cal-day.today { background: var(--purple); color: #fff; font-weight: 600; }
+  .cal-day.has-event::after {
+    content: ''; position: absolute; bottom: 3px; left: 50%;
+    transform: translateX(-50%); width: 4px; height: 4px;
+    border-radius: 50%; background: var(--green);
+  }
+  .cal-day.today.has-event::after { background: rgba(255,255,255,0.8); }
+  .cal-empty { padding: 7px; }
+
+  /* ===== PROGRESSION ===== */
+  .prog-item { margin-bottom: 16px; }
+  .prog-row {
+    display: flex; justify-content: space-between;
+    font-size: 13px; color: var(--text-secondary); margin-bottom: 7px;
+  }
+  .prog-row span:last-child { font-weight: 500; color: var(--text-primary); }
+  .prog-track { background: var(--bg-secondary); border-radius: 5px; height: 8px; }
+  .prog-fill  { height: 8px; border-radius: 5px; transition: width .6s ease; }
+  .activity-bars {
+    display: flex; align-items: flex-end;
+    gap: 8px; height: 90px; padding: 0 4px;
+    margin-top: 4px;
+  }
+  .act-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .act-bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 2px; }
+  .act-label { font-size: 11px; color: var(--text-tertiary); }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ===== SIDEBAR ===== -->
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-icon"><i class="ti ti-school"></i></div>
+      <div>
+        <div class="logo-text">EduAI</div>
+        <div class="logo-sub">Plateforme</div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <div class="nav-label">Principal</div>
+      <div class="nav-item active" onclick="show('home', this)">
+        <i class="ti ti-layout-dashboard"></i> Tableau de bord
+      </div>
+      <div class="nav-item" onclick="show('ai', this)">
+        <i class="ti ti-robot"></i> Tuteur IA
+        <span class="nav-badge">IA</span>
+      </div>
+      <div class="nav-item" onclick="show('quiz', this)">
+        <i class="ti ti-clipboard-check"></i> Quiz
+      </div>
+      <div class="nav-item" onclick="show('agenda', this)">
+        <i class="ti ti-calendar"></i> Agenda
+      </div>
+      <div class="nav-label" style="margin-top: 6px;">Mon espace</div>
+      <div class="nav-item" onclick="show('prog', this)">
+        <i class="ti ti-chart-line"></i> Progression
+      </div>
+      <div class="nav-item" style="opacity: .5; pointer-events: none;">
+        <i class="ti ti-settings"></i> Paramètres
+      </div>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="progress-title">
+        Semaine en cours <span>68%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width: 68%;"></div>
+      </div>
+      <div class="progress-stats">
+        <span>3h 24min étudiées</span>
+        <span>5h objectif</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main">
+    <div class="topbar">
+      <span class="topbar-title" id="topbar-title">Bonjour, Kofi 👋</span>
+      <div class="search-box">
+        <i class="ti ti-search" style="font-size:14px;"></i>
+        Rechercher un cours...
+      </div>
+      <div class="avatar">KO</div>
+    </div>
+
+    <div class="content">
+
+      <!-- ======== TABLEAU DE BORD ======== -->
+      <div id="panel-home" class="panel active">
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-num" style="color:var(--purple)">4</div>
+            <div class="stat-lbl"><i class="ti ti-book" style="font-size:12px;"></i> Cours actifs</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" style="color:var(--green)">12</div>
+            <div class="stat-lbl"><i class="ti ti-flame" style="font-size:12px;"></i> Jours consécutifs</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" style="color:var(--amber)">87%</div>
+            <div class="stat-lbl"><i class="ti ti-star" style="font-size:12px;"></i> Moy. quiz</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" style="color:var(--pink)">2</div>
+            <div class="stat-lbl"><i class="ti ti-clock" style="font-size:12px;"></i> Échéances</div>
+          </div>
+        </div>
+
+        <div class="section-title">Mes cours</div>
+        <div class="cards-grid">
+          <div class="course-card">
+            <div class="course-thumb" style="background:var(--purple-light)">📐</div>
+            <div class="course-body">
+              <span class="course-tag tag-math">Maths</span>
+              <div class="course-name">Algèbre linéaire</div>
+              <div class="course-meta"><i class="ti ti-book" style="font-size:11px;"></i> 12 leçons</div>
+              <div class="mini-bar"><div class="mini-fill" style="width:72%;background:var(--purple);"></div></div>
+            </div>
+          </div>
+          <div class="course-card">
+            <div class="course-thumb" style="background:var(--green-light)">🔬</div>
+            <div class="course-body">
+              <span class="course-tag tag-sci">Sciences</span>
+              <div class="course-name">Chimie organique</div>
+              <div class="course-meta"><i class="ti ti-book" style="font-size:11px;"></i> 9 leçons</div>
+              <div class="mini-bar"><div class="mini-fill" style="width:45%;background:var(--green);"></div></div>
+            </div>
+          </div>
+          <div class="course-card">
+            <div class="course-thumb" style="background:var(--coral-light)">🌍</div>
+            <div class="course-body">
+              <span class="course-tag tag-lang">Langues</span>
+              <div class="course-name">Anglais avancé</div>
+              <div class="course-meta"><i class="ti ti-book" style="font-size:11px;"></i> 15 leçons</div>
+              <div class="mini-bar"><div class="mini-fill" style="width:88%;background:var(--coral);"></div></div>
+            </div>
+          </div>
+          <div class="course-card">
+            <div class="course-thumb" style="background:var(--blue-light)">🏛️</div>
+            <div class="course-body">
+              <span class="course-tag tag-hist">Histoire</span>
+              <div class="course-name">Histoire moderne</div>
+              <div class="course-meta"><i class="ti ti-book" style="font-size:11px;"></i> 8 leçons</div>
+              <div class="mini-bar"><div class="mini-fill" style="width:30%;background:var(--blue);"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title">Prochaines activités</div>
+        <div class="event-list">
+          <div class="event-item">
+            <div class="event-time">14:00 auj.</div>
+            <div>
+              <div class="event-name">Quiz — Algèbre linéaire ch.3</div>
+              <div class="event-sub">Aujourd'hui · ~20 min</div>
+            </div>
+            <i class="ti ti-arrow-right" style="margin-left:auto;color:var(--text-tertiary);"></i>
+          </div>
+          <div class="event-item" style="border-color:var(--green)">
+            <div class="event-time">Demain</div>
+            <div>
+              <div class="event-name">Devoir — Rédaction anglaise</div>
+              <div class="event-sub">À rendre avant 23h59</div>
+            </div>
+            <i class="ti ti-arrow-right" style="margin-left:auto;color:var(--text-tertiary);"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======== TUTEUR IA ======== -->
+      <div id="panel-ai" class="panel">
+        <div class="ai-panel">
+          <div class="quick-btns">
+            <button class="quick-btn" onclick="askAI('Explique-moi les matrices')">📐 Matrices</button>
+            <button class="quick-btn" onclick="askAI('Comment résoudre une équation du second degré ?')">📊 Équations 2e degré</button>
+            <button class="quick-btn" onclick="askAI('Qu\'est-ce que la photosynthèse ?')">🌱 Photosynthèse</button>
+            <button class="quick-btn" onclick="askAI('Aide-moi à réviser mon cours de chimie')">🔬 Révision chimie</button>
+            <button class="quick-btn" onclick="askAI('Crée-moi un résumé d\'histoire moderne')">🏛️ Résumé histoire</button>
+          </div>
+          <div class="ai-msgs" id="ai-msgs">
+            <div class="ai-msg bot">
+              <div class="ai-avatar bot"><i class="ti ti-robot" style="font-size:14px;"></i></div>
+              <div class="ai-bubble">Bonjour Kofi ! Je suis ton tuteur IA. 👋
+
+Je peux t'expliquer des concepts, t'aider à réviser, corriger tes exercices ou générer des quiz personnalisés.
+
+Utilise les raccourcis ci-dessus ou pose-moi directement ta question !</div>
+            </div>
+          </div>
+          <div class="typing" id="typing">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          </div>
+          <div class="ai-input-row">
+            <input class="ai-input" id="ai-input" placeholder="Pose ta question ici..." onkeydown="if(event.key==='Enter') sendAI()">
+            <button class="ai-send" onclick="sendAI()">
+              <i class="ti ti-send" style="font-size:14px;"></i> Envoyer
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======== QUIZ ======== -->
+      <div id="panel-quiz" class="panel">
+        <div class="score-bar">
+          <div class="score-num" id="score-display">0 / 3</div>
+          <div class="score-info">
+            <div class="score-info-title">Quiz — Algèbre linéaire</div>
+            <div class="score-info-sub">Répondez à toutes les questions pour valider</div>
+          </div>
+          <button class="reset-btn" onclick="resetQuiz()">
+            <i class="ti ti-refresh" style="font-size:14px;"></i> Recommencer
+          </button>
+        </div>
+        <div id="quiz-container"></div>
+      </div>
+
+      <!-- ======== AGENDA ======== -->
+      <div id="panel-agenda" class="panel">
+        <div class="section-title">Mai 2026</div>
+        <div class="cal-grid" id="cal-grid"></div>
+        <div class="section-title">Événements du mois</div>
+        <div class="event-list">
+          <div class="event-item">
+            <div class="event-time">17 mai</div>
+            <div>
+              <div class="event-name">Quiz Algèbre ch.3</div>
+              <div class="event-sub">14h00 · ~20 min</div>
+            </div>
+          </div>
+          <div class="event-item" style="border-color:var(--green)">
+            <div class="event-time">18 mai</div>
+            <div>
+              <div class="event-name">Devoir anglais (rédaction)</div>
+              <div class="event-sub">À rendre avant 23h59</div>
+            </div>
+          </div>
+          <div class="event-item" style="border-color:var(--amber)">
+            <div class="event-time">22 mai</div>
+            <div>
+              <div class="event-name">Examen — Chimie organique</div>
+              <div class="event-sub">09h00 · 2h · Salle B12</div>
+            </div>
+          </div>
+          <div class="event-item" style="border-color:var(--blue)">
+            <div class="event-time">28 mai</div>
+            <div>
+              <div class="event-name">Présentation Histoire moderne</div>
+              <div class="event-sub">11h00 · Groupe B</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======== PROGRESSION ======== -->
+      <div id="panel-prog" class="panel">
+        <div class="section-title">Progression par matière</div>
+
+        <div class="prog-item">
+          <div class="prog-row"><span>📐 Algèbre linéaire</span><span>72%</span></div>
+          <div class="prog-track"><div class="prog-fill" style="width:72%;background:var(--purple);"></div></div>
+        </div>
+        <div class="prog-item">
+          <div class="prog-row"><span>🔬 Chimie organique</span><span>45%</span></div>
+          <div class="prog-track"><div class="prog-fill" style="width:45%;background:var(--green);"></div></div>
+        </div>
+        <div class="prog-item">
+          <div class="prog-row"><span>🌍 Anglais avancé</span><span>88%</span></div>
+          <div class="prog-track"><div class="prog-fill" style="width:88%;background:var(--coral);"></div></div>
+        </div>
+        <div class="prog-item">
+          <div class="prog-row"><span>🏛️ Histoire moderne</span><span>30%</span></div>
+          <div class="prog-track"><div class="prog-fill" style="width:30%;background:var(--blue);"></div></div>
+        </div>
+
+        <div class="section-title" style="margin-top:20px;">Activité de la semaine</div>
+        <div class="activity-bars" id="activity-bars"></div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+// ===== NAVIGATION =====
+const TITLES = {
+  home:   'Bonjour, Kofi 👋',
+  ai:     'Tuteur IA',
+  quiz:   'Quiz interactif',
+  agenda: 'Mon agenda',
+  prog:   'Ma progression'
+};
+
+function show(id, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('topbar-title').textContent = TITLES[id] || '';
+}
+
+// ===== TUTEUR IA =====
+const RESPONSES = {
+  matric: `Une matrice est un tableau rectangulaire de nombres organisés en lignes et colonnes.
+
+Exemple d'une matrice 2×2 :
+  | a  b |
+  | c  d |
+
+Opérations possibles :
+• Addition/soustraction (mêmes dimensions)
+• Multiplication (colonnes A = lignes B)
+• Déterminant : det = ad − bc
+• Inversion si det ≠ 0
+
+Veux-tu que j'explique la multiplication de matrices avec un exemple ?`,
+
+  equation: `Pour résoudre une équation du second degré ax² + bx + c = 0 :
+
+1. Calculer le discriminant : Δ = b² − 4ac
+
+   • Δ > 0 → deux solutions réelles distinctes
+   • Δ = 0 → une solution double
+   • Δ < 0 → aucune solution réelle
+
+2. Trouver les solutions :
+   x = (−b ± √Δ) / (2a)
+
+Exemple : x² − 5x + 6 = 0
+Δ = 25 − 24 = 1
+x₁ = (5+1)/2 = 3   x₂ = (5−1)/2 = 2 ✓`,
+
+  photosynth: `La photosynthèse est le processus par lequel les plantes convertissent la lumière solaire en énergie chimique.
+
+Équation bilan :
+6CO₂ + 6H₂O + lumière → C₆H₁₂O₆ + 6O₂
+
+Elle se déroule dans les chloroplastes (grâce à la chlorophylle) en deux phases :
+
+1. Phase lumineuse : capture de l'énergie lumineuse → production d'ATP et NADPH
+2. Cycle de Calvin (phase obscure) : fixation du CO₂ → synthèse du glucose
+
+Dois-je détailler l'une de ces deux phases ?`,
+
+  chimie: `Voici les thèmes essentiels pour réviser la chimie organique :
+
+1. Liaisons covalentes & ioniques
+2. Groupes fonctionnels :
+   — alcool (-OH), aldéhyde (-CHO), cétone (C=O)
+   — acide carboxylique (-COOH), ester (-COO-)
+3. Nomenclature IUPAC
+4. Réactions clés :
+   — Estérification / hydrolyse
+   — Oxydation des alcools
+   — Saponification
+
+Par quel thème veux-tu commencer ? Je peux aussi créer un quiz de révision.`,
+
+  histoire: `Voici un résumé de l'histoire moderne (XVe–XVIIIe siècle) :
+
+📌 Grandes découvertes (1492–1522)
+• Christophe Colomb découvre l'Amérique (1492)
+• Vasco de Gama ouvre la route des Indes (1498)
+• Magellan : premier tour du monde (1519–1522)
+
+📌 Renaissance (XVe–XVIe s.)
+• Révolution artistique et intellectuelle
+• Humanisme, imprimerie (Gutenberg, 1450)
+
+📌 Réformes religieuses (XVIe s.)
+• Luther (1517), Calvin, contre-réforme
+
+📌 Révolution française (1789)
+• Fin de l'Ancien Régime, Déclaration des droits de l'homme
+
+Veux-tu des détails sur l'un de ces points ?`,
+
+  default: [
+    `Bonne question ! Voici les points essentiels à retenir sur ce sujet.
+
+N'hésite pas à me demander des exemples pratiques ou des exercices pour consolider ta compréhension. Je peux aussi créer un quiz personnalisé si tu le souhaites !`,
+    `Je suis là pour t'aider ! Peux-tu préciser un peu ta question pour que je puisse te donner l'explication la plus adaptée ?
+
+Tu peux aussi me dire dans quel cours tu travailles actuellement, afin que je contextualise mieux ma réponse.`,
+    `Excellent sujet de révision ! Ce point est souvent demandé aux examens.
+
+Je te recommande de :
+1. Bien comprendre le concept de base
+2. Faire des exercices progressifs
+3. Te tester avec un quiz
+
+Veux-tu que je commence par t'expliquer les fondamentaux ?`
+  ]
+};
+
+function getReply(msg) {
+  const m = msg.toLowerCase();
+  if (m.includes('matric') || m.includes('vecteur') || m.includes('déterminant')) return RESPONSES.matric;
+  if (m.includes('équation') || m.includes('second degré') || m.includes('discriminant')) return RESPONSES.equation;
+  if (m.includes('photos') || m.includes('plante') || m.includes('chloro')) return RESPONSES.photosynth;
+  if (m.includes('chimie') || m.includes('organique') || m.includes('révision')) return RESPONSES.chimie;
+  if (m.includes('histoire') || m.includes('résumé') || m.includes('moderne')) return RESPONSES.histoire;
+  return RESPONSES.default[Math.floor(Math.random() * 3)];
+}
+
+function addMsg(text, role) {
+  const msgs = document.getElementById('ai-msgs');
+  const wrap = document.createElement('div');
+  wrap.className = 'ai-msg ' + role;
+
+  const av = document.createElement('div');
+  av.className = 'ai-avatar ' + (role === 'bot' ? 'bot' : 'user');
+  av.innerHTML = role === 'bot'
+    ? '<i class="ti ti-robot" style="font-size:14px;"></i>'
+    : 'KO';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'ai-bubble';
+  bubble.style.whiteSpace = 'pre-wrap';
+  bubble.textContent = text;
+
+  wrap.appendChild(av);
+  wrap.appendChild(bubble);
+  msgs.appendChild(wrap);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function sendAI() {
+  const inp = document.getElementById('ai-input');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  addMsg(msg, 'user');
+  inp.value = '';
+
+  const t = document.getElementById('typing');
+  t.classList.add('show');
+  document.getElementById('ai-msgs').scrollTop = 99999;
+
+  const delay = 900 + Math.random() * 800;
+  setTimeout(() => {
+    t.classList.remove('show');
+    addMsg(getReply(msg), 'bot');
+  }, delay);
+}
+
+function askAI(question) {
+  // Navigate to AI panel
+  const aiNav = document.querySelector('.nav-item:nth-child(3)');
+  show('ai', document.querySelectorAll('.nav-item')[1]);
+  document.getElementById('ai-input').value = question;
+  setTimeout(sendAI, 150);
+}
+
+// ===== QUIZ =====
+const QUESTIONS = [
+  {
+    q: 'Quelle est la valeur du déterminant de la matrice identité 2×2 ?',
+    opts: ['0', '1', '2', '−1'],
+    ok: 1,
+    exp: 'La matrice identité 2×2 a det(I) = 1×1 − 0×0 = 1. Le déterminant de toute matrice identité vaut 1.'
+  },
+  {
+    q: 'Si A·x = b est un système linéaire, que représente la matrice A ?',
+    opts: ['Le vecteur solution', 'La matrice des coefficients', 'Le vecteur des constantes', 'Le rang du système'],
+    ok: 1,
+    exp: 'A est la matrice des coefficients du système. x est le vecteur des inconnues et b le vecteur des constantes.'
+  },
+  {
+    q: 'Une matrice carrée est inversible si et seulement si :',
+    opts: ['Son déterminant est nul', 'Son déterminant est non nul', 'Elle est symétrique', 'Elle est diagonale'],
+    ok: 1,
+    exp: 'Une matrice est inversible (régulière) si et seulement si son déterminant est différent de zéro (det(A) ≠ 0).'
+  }
+];
+
+let score = 0;
+let answered = [];
+
+function renderQuiz() {
+  const c = document.getElementById('quiz-container');
+  c.innerHTML = '';
+
+  QUESTIONS.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'quiz-q';
+
+    const p = document.createElement('p');
+    p.textContent = (i + 1) + '. ' + q.q;
+    card.appendChild(p);
+
+    q.opts.forEach((opt, j) => {
+      const btn = document.createElement('button');
+      btn.className = 'quiz-opt';
+      btn.textContent = opt;
+
+      if (answered[i] !== undefined) {
+        if (j === q.ok) btn.classList.add('correct');
+        else if (j === answered[i] && j !== q.ok) btn.classList.add('wrong');
+        btn.disabled = true;
+      } else {
+        btn.onclick = () => answer(i, j, card, q);
+      }
+      card.appendChild(btn);
+    });
+
+    const res = document.createElement('div');
+    res.className = 'quiz-result';
+    if (answered[i] !== undefined) {
+      const correct = answered[i] === q.ok;
+      res.classList.add('show', correct ? 'ok' : 'bad');
+      res.innerHTML = (correct
+        ? '<i class="ti ti-check"></i> '
+        : '<i class="ti ti-x"></i> ') + q.exp;
+    }
+    card.appendChild(res);
+    c.appendChild(card);
+  });
+
+  document.getElementById('score-display').textContent = score + ' / ' + QUESTIONS.length;
+}
+
+function answer(i, j, card, q) {
+  answered[i] = j;
+  const correct = j === q.ok;
+  if (correct) score++;
+
+  card.querySelectorAll('.quiz-opt').forEach((btn, k) => {
+    if (k === q.ok) btn.classList.add('correct');
+    else if (k === j && j !== q.ok) btn.classList.add('wrong');
+    btn.disabled = true;
+  });
+
+  const res = card.querySelector('.quiz-result');
+  res.classList.add('show', correct ? 'ok' : 'bad');
+  res.innerHTML = (correct
+    ? '<i class="ti ti-check"></i> '
+    : '<i class="ti ti-x"></i> ') + q.exp;
+
+  document.getElementById('score-display').textContent = score + ' / ' + QUESTIONS.length;
+}
+
+function resetQuiz() {
+  score = 0;
+  answered = [];
+  renderQuiz();
+}
+
+// ===== AGENDA / CALENDRIER =====
+function buildCalendar() {
+  const grid = document.getElementById('cal-grid');
+  const days = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  const eventDays = [17, 18, 22, 28];
+  const today = 17;
+  const firstWeekday = 4; // Mai 2026 commence un vendredi (index 4 = vendredi)
+
+  days.forEach(d => {
+    const h = document.createElement('div');
+    h.className = 'cal-head';
+    h.textContent = d;
+    grid.appendChild(h);
+  });
+
+  for (let i = 0; i < firstWeekday; i++) {
+    const e = document.createElement('div');
+    e.className = 'cal-empty';
+    grid.appendChild(e);
+  }
+
+  for (let d = 1; d <= 31; d++) {
+    const e = document.createElement('div');
+    e.className = 'cal-day';
+    if (d === today) e.classList.add('today');
+    if (eventDays.includes(d)) e.classList.add('has-event');
+    e.textContent = d;
+    grid.appendChild(e);
+  }
+}
+
+// ===== ACTIVITÉ DE LA SEMAINE =====
+function buildActivity() {
+  const container = document.getElementById('activity-bars');
+  const data = [
+    { day: 'L', h: 40, active: false },
+    { day: 'M', h: 75, active: false },
+    { day: 'M', h: 55, active: false },
+    { day: 'J', h: 90, active: true  },
+    { day: 'V', h: 68, active: false },
+    { day: 'S', h: 30, active: false },
+    { day: 'D', h: 0,  active: false },
+  ];
+
+  data.forEach(({ day, h, active }) => {
+    const col = document.createElement('div');
+    col.className = 'act-col';
+
+    const bar = document.createElement('div');
+    bar.className = 'act-bar';
+    Object.assign(bar.style, {
+      height: h + '%',
+      background: active ? 'var(--purple)' : 'var(--purple-light)',
+      borderRadius: '4px 4px 0 0',
+      width: '100%',
+      minHeight: h > 0 ? '4px' : '0'
+    });
+
+    const lbl = document.createElement('div');
+    lbl.className = 'act-label';
+    lbl.textContent = day;
+
+    col.appendChild(bar);
+    col.appendChild(lbl);
+    container.appendChild(col);
+  });
+}
+
+// ===== INIT =====
+renderQuiz();
+buildCalendar();
+buildActivity();
+</script>
+</body>
+</html>
